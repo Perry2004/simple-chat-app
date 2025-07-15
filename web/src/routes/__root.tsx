@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
 import type { ReactNode } from "react";
 import {
-  Outlet,
   createRootRoute,
   HeadContent,
   Scripts,
@@ -10,7 +9,7 @@ import {
 import NotFound404 from "@/pages/NotFound404";
 import "@/styles/index.css";
 import { HeroUIProvider } from "@heroui/react";
-import { useTheme } from "@/stores/useTheme";
+import { RootLayout } from "@/layouts/RootLayout";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -33,17 +32,14 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const router = useRouter();
-  const theme = useTheme((state) => state.theme);
 
   return (
     <RootDocument>
       <HeroUIProvider
         navigate={(to, options) => router.navigate({ to, ...(options || {}) })}
         useHref={(to) => router.buildLocation({ to }).href}
-        >
-        <div className={theme}>
-          <Outlet />
-        </div>
+      >
+        <RootLayout />
       </HeroUIProvider>
     </RootDocument>
   );
