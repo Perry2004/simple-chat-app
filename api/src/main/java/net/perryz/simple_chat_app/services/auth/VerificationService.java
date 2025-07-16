@@ -1,4 +1,4 @@
-package net.perryz.simple_chat_app.services;
+package net.perryz.simple_chat_app.services.auth;
 
 import java.time.LocalDateTime;
 import java.util.Random;
@@ -6,7 +6,9 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 import net.perryz.simple_chat_app.entities.Verification;
@@ -27,6 +29,7 @@ public class VerificationService {
         this.mailSender = mailSender;
     }
 
+    @Transactional
     public void sendVerificationEmail(String email) {
         String verificationCode = generateVerificationCode();
         var verification = new Verification();
@@ -61,6 +64,57 @@ public class VerificationService {
                         "Simple Chat App",
                 code));
 
-        mailSender.send(message);
+        // mailSender.send(message);
+    }
+
+    public boolean verifyCode(String email, String verificationCode) {
+        var verification = verificationRepository.findByEmail(email);
+        if (verification.isEmpty()) {
+            log.error("No verification found for email: {}", email);
+            return false;
+        }
+
+        var verificationRecord = verification.get();
+        if (isCodeExpired(verificationRecord)) {
+            log.error("Verification code expired for email: {}", email);
+            return false;
+        }
+
+        if (!verificationRecord.getVerificationCode().equals(verificationCode)) {
+            log.error("Invalid verification code for email: {}", email);
+            return false;
+        }
+
+        log.info("Verification code validated successfully for email: {}", email);
+        return true;
+    }
+
+    private boolean isCodeExpired(Verification verification) {
+        return verification.getExpiresAt().isBefore(LocalDateTime.now());
+    }
+
+    @Transactional
+    public boolean removeVerification(String email) {
+        var verification = verificationRepository.findByEmail(email);
+        if (verification.isEmpty()) {
+            log.error("No verification found for email: {}", email);
+            return false;
+        }
+        verificationRepository.deleteByEmail(email);
+        log.info("Verification record removed for email: {}", email);
+        return true;
+    }
+
+    @Scheduled(cron = "0 0 2 * * ?")
+    void cleanupExpiredVerifications() {
+        var now = LocalDateTime.now();
+        var expiredVerifications = verificationRepository.findAll().stream()
+                .filter(v -> v.getExpiresAt().isBefore(now))
+                .toList();
+
+        for (var verification : expiredVerifications) {
+            verificationRepository.delete(verification);
+            log.info("Removed expired verification for email: {}", verification.getEmail());
+        }
     }
 }

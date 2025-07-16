@@ -10,9 +10,9 @@ import net.perryz.simple_chat_app.dtos.LoginUserResponse;
 import net.perryz.simple_chat_app.dtos.RegisterUserRequest;
 import net.perryz.simple_chat_app.dtos.SendVerificationRequest;
 import net.perryz.simple_chat_app.entities.User;
-import net.perryz.simple_chat_app.services.AuthService;
-import net.perryz.simple_chat_app.services.JwtService;
-import net.perryz.simple_chat_app.services.VerificationService;
+import net.perryz.simple_chat_app.services.auth.AuthService;
+import net.perryz.simple_chat_app.services.auth.JwtService;
+import net.perryz.simple_chat_app.services.auth.VerificationService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +34,7 @@ public class AuthController {
     }
 
     /**
-     * Register a new user into the system.
+     * Registers a new user into the system.
      * 
      * @param registerUserRequest
      * @return
@@ -46,7 +46,7 @@ public class AuthController {
     }
 
     /**
-     * Login a user and return a JWT token.
+     * Logins a user and return a JWT token.
      * 
      * @param loginUserRequest
      * @return
@@ -62,7 +62,7 @@ public class AuthController {
     }
 
     /**
-     * Check if there's an existing user with the given email.
+     * Checks if there's an existing user with the given email.
      * 
      * @param email
      * @return
@@ -70,13 +70,15 @@ public class AuthController {
     @GetMapping("/check-email")
     public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
         boolean exists = authService.checkEmailExists(email);
-        if (exists) {
-            return ResponseEntity.status(409).body(exists); // 409 Conflict
-        } else {
-            return ResponseEntity.ok(exists);
-        }
+        return ResponseEntity.ok(exists);
     }
 
+    /**
+     * Sends an email with a verification code to the user.
+     * 
+     * @param sendVerificationRequest
+     * @return
+     */
     @PostMapping("/send-verification")
     public ResponseEntity<String> sendVerificationEmail(@RequestBody SendVerificationRequest sendVerificationRequest) {
         verificationService.sendVerificationEmail(sendVerificationRequest.email());

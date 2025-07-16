@@ -52,6 +52,11 @@ public class GlobalExceptionHandler {
                     "Data integrity violation, possibly due to duplicate entries or constraints");
         }
 
+        if (exception instanceof IllegalArgumentException) {
+            errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(400), exception.getMessage());
+            errorDetail.setProperty("description", "Invalid argument provided");
+        }
+
         if (errorDetail == null) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(500), exception.getMessage());
             errorDetail.setProperty("description", "Unknown internal server error.");

@@ -1,0 +1,10 @@
+POSTGRES_PASSWORD=postgres_password
+POSTGRES_DB=simple_chat_db
+
+JWT_SECRET_KEY=jwt_secret_key
+JWT_EXPIRATION_TIME=jwt_expiration_time
+
+FRONTEND_URL=frontend_url
+
+GMAIL_USERNAME=gmail_username
+GMAIL_APP_PASSWORD=gmail_app_password
