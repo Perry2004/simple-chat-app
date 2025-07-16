@@ -27,9 +27,9 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User signup(RegisterUserRequest input) {
+    public User register(RegisterUserRequest input) {
         User newUser = new User();
-        newUser.setFullName(input.fullName());
+        newUser.setUserName(input.userName());
         newUser.setEmail(input.email());
         newUser.setPassword(passwordEncoder.encode(input.password()));
 
@@ -44,5 +44,9 @@ public class AuthService {
 
         return userRepository.findByEmail(input.email())
                 .orElseThrow();
+    }
+
+    public boolean checkEmailExists(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 }

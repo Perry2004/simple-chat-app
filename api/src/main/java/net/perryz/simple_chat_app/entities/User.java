@@ -1,7 +1,7 @@
 package net.perryz.simple_chat_app.entities;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -27,7 +27,7 @@ public class User implements UserDetails {
     private Integer id;
 
     @Column(nullable = false)
-    private String fullName;
+    private String userName;
 
     @Column(unique = true, length = 100, nullable = false)
     private String email;
@@ -37,11 +37,11 @@ public class User implements UserDetails {
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

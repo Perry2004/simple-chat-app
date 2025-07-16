@@ -11,10 +11,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import net.perryz.simple_chat_app.repositories.UserRepository;
 
 @Configuration
-public class MainConfig {
+public class UserAuthConfig {
     private final UserRepository userRepository;
 
-    public MainConfig(UserRepository userRepository) {
+    public UserAuthConfig(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -30,7 +30,7 @@ public class MainConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }
