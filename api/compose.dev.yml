@@ -1,0 +1,15 @@
+services:
+  api:
+    image: mcr.microsoft.com/devcontainers/java:21
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - simple_chat_app_dev_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  simple_chat_app_dev_postgres_data:
