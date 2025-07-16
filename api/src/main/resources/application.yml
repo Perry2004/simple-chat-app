@@ -1,0 +1,18 @@
+server:
+  port: 8888
+  address: localhost
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+    username: postgres
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        '[format_sql]': true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
