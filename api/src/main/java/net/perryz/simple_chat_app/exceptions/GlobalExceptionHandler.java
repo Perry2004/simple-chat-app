@@ -54,7 +54,12 @@ public class GlobalExceptionHandler {
 
         if (exception instanceof IllegalArgumentException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(400), exception.getMessage());
-            errorDetail.setProperty("description", "Invalid argument provided");
+            errorDetail.setProperty("description", "Invalid data provided");
+        }
+
+        if (exception instanceof IllegalStateException) {
+            errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(400), exception.getMessage());
+            errorDetail.setProperty("description", "Request too frequent");
         }
 
         if (errorDetail == null) {

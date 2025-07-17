@@ -31,12 +31,23 @@ public class VerificationService {
 
     @Transactional
     public void sendVerificationEmail(String email) {
+        var verification = verificationRepository.findByEmail(email);
+        if (verification.isPresent()
+                && verification.get().getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(1))) {
+            log.warn("Verification request too frequent for email: {}", email);
+            throw new IllegalStateException("Verification request too frequent. Please try again later.");
+        }
         String verificationCode = generateVerificationCode();
-        var verification = new Verification();
-        verification.setEmail(email);
-        verification.setVerificationCode(verificationCode);
-        verification.setExpiresAt(LocalDateTime.now().plusMinutes(VERIFICATION_EXPIRATION_MINUTES));
-        verificationRepository.save(verification);
+        var newVerification = new Verification();
+        newVerification.setEmail(email);
+        newVerification.setVerificationCode(verificationCode);
+        newVerification.setExpiresAt(LocalDateTime.now().plusMinutes(VERIFICATION_EXPIRATION_MINUTES));
+        if (verification.isPresent()) {
+            newVerification.setCreatedAt(LocalDateTime.now());
+            verificationRepository.update(newVerification);
+        } else {
+            verificationRepository.save(newVerification);
+        }
         sendVerificationEmail(email, verificationCode);
     }
 
