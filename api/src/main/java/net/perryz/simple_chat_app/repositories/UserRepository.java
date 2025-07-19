@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import net.perryz.simple_chat_app.entities.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 }

@@ -9,13 +9,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-@Table(name = "verifications")
+@Table(name = "preregistrations")
 @Entity
 @Data
-public class Verification {
+public class Preregistration {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
@@ -25,7 +27,7 @@ public class Verification {
     private String email;
 
     @Column(nullable = false)
-    private String verificationCode;
+    private String password;
 
     @Column(nullable = false, updatable = false, name = "created_at")
     @CreationTimestamp
@@ -33,4 +35,11 @@ public class Verification {
 
     @Column(nullable = false, name = "expires_at")
     private LocalDateTime expiresAt;
+
+    @Column(nullable = false, name = "registration_token")
+    private String registrationToken;
+
+    @OneToOne
+    @JoinColumn(name = "verification_id", nullable = true, referencedColumnName = "id")
+    private Verification verification;
 }

@@ -24,10 +24,10 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false)
-    private String userName;
+    private String customizedUserName;
 
     @Column(unique = true, length = 100, nullable = false)
     private String email;
