@@ -1,8 +1,8 @@
-import { useTheme } from "@/stores/useTheme";
+import { useTheme } from "@/hooks/stores/useTheme";
 import { Button } from "@heroui/react";
 import { Moon, Sun } from "lucide-react";
 
-export function ThemeToggle() {
+export default function ThemeToggle() {
   const resolvedTheme = useTheme((state) => state.resolvedTheme);
   const toggleTheme = useTheme((state) => state.toggleTheme);
   return (

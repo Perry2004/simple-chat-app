@@ -1,4 +1,4 @@
-import { useTheme, Theme } from "@/stores/useTheme";
+import { useTheme, Theme } from "@/hooks/stores/useTheme";
 import {
   Dropdown,
   DropdownTrigger,
@@ -8,7 +8,7 @@ import {
 } from "@heroui/react";
 import { Sun, Moon, MonitorCog } from "lucide-react";
 
-export function ThemeSelection() {
+export default function ThemeSelection() {
   const setTheme = useTheme((state) => state.setTheme);
   const theme = useTheme((state) => state.theme);
   const resolvedTheme = useTheme((state) => state.resolvedTheme);

@@ -11,9 +11,9 @@ import {
 } from "@heroui/react";
 import { MessageCircleCode } from "lucide-react";
 import { useState } from "react";
-import { ThemeSelection } from "./ThemeSelection";
+import ThemeSelection from "./ThemeSelection";
 
-export function NavBar() {
+export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuItems = [
     "Profile",
@@ -36,12 +36,10 @@ export function NavBar() {
           className="sm:hidden"
         />
         <NavbarBrand>
-          <MessageCircleCode />
-          <p className="font-bold text-inherit">
-            <Link href="/" className="text-inherit">
-              simple-chat-app
-            </Link>
-          </p>
+          <Link href="/" className="text-inherit">
+            <MessageCircleCode />
+            <p className="font-bold text-inherit">simple-chat-app</p>
+          </Link>
         </NavbarBrand>
       </NavbarContent>
 

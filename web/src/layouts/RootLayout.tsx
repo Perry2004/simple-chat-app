@@ -1,8 +1,8 @@
-import { NavBar } from "@/components/NavBar";
-import { useTheme, useThemeInitialization } from "@/stores/useTheme";
+import NavBar from "@/components/nav/NavBar";
+import { useTheme, useThemeInitialization } from "@/hooks/stores/useTheme";
 import { Outlet } from "@tanstack/react-router";
 
-export function RootLayout() {
+export default function RootLayout() {
   const resolvedTheme = useTheme((state) => state.resolvedTheme);
   // Initialize theme properly on client side to avoid hydration mismatch
   useThemeInitialization();

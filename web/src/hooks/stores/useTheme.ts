@@ -1,5 +1,10 @@
 import { create } from "zustand";
-import { persist, createJSONStorage, devtools } from "zustand/middleware";
+import {
+  persist,
+  createJSONStorage,
+  devtools,
+  combine,
+} from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { useEffect } from "react";
 
@@ -29,30 +34,31 @@ const resolveTheme = (theme: Theme): ResolvedTheme => {
 export const useTheme = create<ThemeState>()(
   devtools(
     persist(
-      immer((set) => {
-        const initialTheme: Theme = "device";
-        const initialResolvedTheme: ResolvedTheme = "light";
-
-        return {
-          theme: initialTheme,
-          resolvedTheme: initialResolvedTheme,
-          setTheme: (theme: Theme) => {
-            set((state) => {
-              state.theme = theme;
-              state.resolvedTheme = resolveTheme(theme);
-            });
+      immer(
+        combine(
+          {
+            theme: "device" as Theme,
+            resolvedTheme: "light" as ResolvedTheme,
           },
-          toggleTheme: () => {
-            set((state) => {
-              const currentResolvedTheme = state.resolvedTheme;
-              const newTheme =
-                currentResolvedTheme === "light" ? "dark" : "light";
-              state.theme = newTheme;
-              state.resolvedTheme = resolveTheme(newTheme);
-            });
-          },
-        };
-      }),
+          (set) => ({
+            setTheme: (theme: Theme) => {
+              set((state) => {
+                state.theme = theme;
+                state.resolvedTheme = resolveTheme(theme);
+              });
+            },
+            toggleTheme: () => {
+              set((state) => {
+                const currentResolvedTheme = state.resolvedTheme;
+                const newTheme =
+                  currentResolvedTheme === "light" ? "dark" : "light";
+                state.theme = newTheme;
+                state.resolvedTheme = resolveTheme(newTheme);
+              });
+            },
+          }),
+        ),
+      ),
       {
         name: "theme-storage",
         storage: createJSONStorage(() => localStorage),
@@ -83,9 +89,6 @@ export const useTheme = create<ThemeState>()(
         },
       },
     ),
-    {
-      name: "theme-store", // DevTools store name
-    },
   ),
 );
 

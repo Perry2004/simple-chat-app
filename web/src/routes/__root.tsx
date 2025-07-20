@@ -9,7 +9,10 @@ import {
 import NotFound404 from "@/pages/NotFound404";
 import "@/styles/index.css";
 import { HeroUIProvider } from "@heroui/react";
-import { RootLayout } from "@/layouts/RootLayout";
+import RootLayout from "@/layouts/RootLayout";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -25,11 +28,18 @@ export const Route = createRootRoute({
         title: "Simple Chat App",
       },
     ],
+    links: [
+      {
+        rel: "icon",
+        href: "/favicon.ico",
+      },
+    ],
   }),
   component: RootComponent,
   notFoundComponent: () => <NotFound404 />,
 });
 
+const queryClient = new QueryClient();
 function RootComponent() {
   const router = useRouter();
 
@@ -39,7 +49,11 @@ function RootComponent() {
         navigate={(to, options) => router.navigate({ to, ...(options || {}) })}
         useHref={(to) => router.buildLocation({ to }).href}
       >
-        <RootLayout />
+        <QueryClientProvider client={queryClient}>
+          <RootLayout />
+          <TanStackRouterDevtools />
+          <ReactQueryDevtools />
+        </QueryClientProvider>
       </HeroUIProvider>
     </RootDocument>
   );

@@ -1,98 +1,67 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  Input,
-  Button,
-  Divider,
-} from "@heroui/react";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import SignupCard, { SignupForm } from "@/components/auth/SignupCard";
+import usePreregister from "@/hooks/api/usePreregister";
+import { SubmitHandler } from "react-hook-form";
+import ConfirmVerificationCard from "@/components/auth/ConfirmSendVerification";
+import { useSignup } from "@/hooks/stores/useSignup";
+import { useShallow } from "zustand/shallow";
+import useSendVerification from "@/hooks/api/useSendVerification";
+import EnterVerificationCodeCard from "@/components/auth/EnterVerificationCodeCard";
+import useRegister from "@/hooks/api/useRegister";
+import SignupSuccessCard from "@/components/auth/SignupSuccessCard";
 
 export const Route = createFileRoute("/auth/signup")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+  const preregisterMutation = usePreregister();
+  const sendVerificationMutation = useSendVerification();
+  const registerMutation = useRegister();
+  const { step: signupStep, setRegistrationEmail } = useSignup(
+    useShallow((state) => ({
+      step: state.step,
+      setRegistrationEmail: state.setRegistrationEmail,
+    })),
+  );
 
-  const toggleVisibility = () => setIsVisible(!isVisible);
-  const toggleConfirmVisibility = () => setIsConfirmVisible(!isConfirmVisible);
+  const onPreregister: SubmitHandler<SignupForm> = (data) => {
+    preregisterMutation.mutate({
+      email: data.email,
+      password: data.password,
+    });
+    setRegistrationEmail(data.email);
+  };
+
+  const onSendEmailAccept = () => {
+    sendVerificationMutation.mutate();
+  };
+
+  const onVerificationCodeSubmit = () => {
+    registerMutation.mutate();
+  };
 
   return (
     <div className="flex h-full items-center justify-center">
-      <Card className="w-full max-w-md">
-        <CardHeader className="flex flex-col gap-1 pb-4">
-          <h1 className="text-2xl font-bold">Sign Up</h1>
-          <p className="text-default-500 text-small">
-            Create your account to get started
-          </p>
-        </CardHeader>
-        <Divider />
-        <CardBody className="gap-4 pt-6">
-          <Input
-            type="email"
-            label="Email"
-            placeholder="Enter your email"
-            startContent={<Mail className="h-4 w-4 text-default-400" />}
-          />
-
-          <Input
-            label="Password"
-            placeholder="Enter your password"
-            startContent={<Lock className="h-4 w-4 text-default-400" />}
-            endContent={
-              <button
-                className="focus:outline-none"
-                type="button"
-                onClick={toggleVisibility}
-              >
-                {isVisible ? (
-                  <EyeOff className="h-4 w-4 text-default-400" />
-                ) : (
-                  <Eye className="h-4 w-4 text-default-400" />
-                )}
-              </button>
-            }
-            type={isVisible ? "text" : "password"}
-          />
-
-          <Input
-            label="Confirm Password"
-            placeholder="Confirm your password"
-            startContent={<Lock className="h-4 w-4 text-default-400" />}
-            endContent={
-              <button
-                className="focus:outline-none"
-                type="button"
-                onClick={toggleConfirmVisibility}
-              >
-                {isConfirmVisible ? (
-                  <EyeOff className="h-4 w-4 text-default-400" />
-                ) : (
-                  <Eye className="h-4 w-4 text-default-400" />
-                )}
-              </button>
-            }
-            type={isConfirmVisible ? "text" : "password"}
-          />
-
-          <Button color="primary" size="lg" className="mt-2">
-            Create Account
-          </Button>
-
-          <div className="text-center">
-            <p className="text-default-500 text-small">
-              Already have an account?{" "}
-              <a href="/auth/login" className="text-primary hover:underline">
-                Sign in
-              </a>
-            </p>
-          </div>
-        </CardBody>
-      </Card>
+      {(() => {
+        switch (signupStep) {
+          case "initial":
+            return <SignupCard onSubmit={onPreregister} />;
+          case "entered-credentials":
+            return <ConfirmVerificationCard onAccept={onSendEmailAccept} />;
+          case "verification-sent":
+            return (
+              <EnterVerificationCodeCard
+                onResend={() => {}}
+                onSubmit={onVerificationCodeSubmit}
+              />
+            );
+          case "verified":
+            return <SignupSuccessCard />;
+          default:
+            return null;
+        }
+      })()}
     </div>
   );
 }
