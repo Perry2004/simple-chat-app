@@ -8,21 +8,7 @@ type SignupStep =
   | "verification-sent"
   | "verified";
 
-interface SignupState {
-  step: SignupStep;
-  registrationToken: string | null;
-  registrationEmail: string | null;
-  verificationCode: string | null;
-  resendCooldownExpiry: number | null;
-  nextStep: () => void;
-  reset: () => void;
-  setRegistrationToken: (token: string) => void;
-  setRegistrationEmail: (email: string) => void;
-  setVerificationCode: (code: string) => void;
-  setResendCooldown: () => void;
-}
-
-export const useSignup = create<SignupState>()(
+export const useSignup = create(
   devtools(
     immer(
       combine(

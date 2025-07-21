@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import SignupCard from "@/components/auth/SignupCard";
-import ConfirmVerificationCard from "@/components/auth/ConfirmSendVerificationCard";
-import EnterVerificationCodeCard from "@/components/auth/EnterVerificationCodeCard";
-import SignupSuccessCard from "@/components/auth/SignupSuccessCard";
+import SignupCard from "@/components/auth/signup/SignupCard";
+import ConfirmVerificationCard from "@/components/auth/signup/ConfirmSendVerificationCard";
+import EnterVerificationCodeCard from "@/components/auth/signup/EnterVerificationCodeCard";
+import SignupSuccessCard from "@/components/auth/signup/SignupSuccessCard";
 import { useSignup } from "@/hooks/stores/useSignup";
 import { useShallow } from "zustand/shallow";
 
