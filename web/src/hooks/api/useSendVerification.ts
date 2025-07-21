@@ -4,11 +4,19 @@ import { useShallow } from "zustand/shallow";
 import { axiosInstance } from "@/utils/axiosInstance";
 
 export default function useSendVerification() {
-  const { nextStep, registrationToken, registrationEmail } = useSignup(
+  const {
+    nextStep,
+    registrationToken,
+    registrationEmail,
+    setResendCooldown,
+    step,
+  } = useSignup(
     useShallow((state) => ({
       nextStep: state.nextStep,
       registrationToken: state.registrationToken,
       registrationEmail: state.registrationEmail,
+      setResendCooldown: state.setResendCooldown,
+      step: state.step,
     })),
   );
   return useMutation({
@@ -20,7 +28,10 @@ export default function useSendVerification() {
       return response.data;
     },
     onSuccess: () => {
-      nextStep();
+      setResendCooldown();
+      if (step === "entered-credentials") {
+        nextStep();
+      }
     },
   });
 }

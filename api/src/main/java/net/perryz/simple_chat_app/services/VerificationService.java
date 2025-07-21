@@ -1,4 +1,4 @@
-package net.perryz.simple_chat_app.services.auth;
+package net.perryz.simple_chat_app.services;
 
 import java.time.LocalDateTime;
 import java.util.Random;

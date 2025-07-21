@@ -13,13 +13,9 @@ import net.perryz.simple_chat_app.dtos.RegisterUserRequest;
 import net.perryz.simple_chat_app.dtos.RegisterUserResponse;
 import net.perryz.simple_chat_app.dtos.SendVerificationRequest;
 import net.perryz.simple_chat_app.entities.User;
-import net.perryz.simple_chat_app.services.auth.AuthService;
-import net.perryz.simple_chat_app.services.auth.JwtService;
-import net.perryz.simple_chat_app.services.auth.PreregistrationService;
-import net.perryz.simple_chat_app.services.auth.RegistrationService;
-import net.perryz.simple_chat_app.services.auth.VerificationService;
-
+import net.perryz.simple_chat_app.services.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -28,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthController {
+
+    private final UserService userService;
     private final JwtService jwtService;
     private final AuthService authService;
     private final VerificationService verificationService;
@@ -69,15 +67,34 @@ public class AuthController {
      * @return
      */
     @PostMapping("/send-verification")
-    public void sendVerificationEmail(
+    public ResponseEntity<String> sendVerificationEmail(
             @RequestBody SendVerificationRequest sendVerificationRequest) {
         verificationService.sendVerificationEmail(sendVerificationRequest);
+        return ResponseEntity.ok("Verification email sent successfully.");
     }
 
+    /**
+     * Pre-registers a user and returns a registration token.
+     * 
+     * @param preregisterUserRequest
+     * @return
+     */
     @PostMapping("/pre-register")
     public ResponseEntity<String> preregisterUser(@RequestBody PreregisterUserRequest preregisterUserRequest) {
         var registrationToken = preregistrationService.preregisterUser(preregisterUserRequest);
         return ResponseEntity.ok(registrationToken);
+    }
+
+    /**
+     * Checks if the email is already registered in the system.
+     * 
+     * @param email
+     * @return
+     */
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmailAlreadyRegistered(@RequestParam String email) {
+        boolean isRegistered = userService.checkEmailAlreadyRegistered(email);
+        return ResponseEntity.ok(isRegistered);
     }
 
 }

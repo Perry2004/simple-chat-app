@@ -13,11 +13,13 @@ interface SignupState {
   registrationToken: string | null;
   registrationEmail: string | null;
   verificationCode: string | null;
+  resendCooldownExpiry: number | null;
   nextStep: () => void;
   reset: () => void;
   setRegistrationToken: (token: string) => void;
   setRegistrationEmail: (email: string) => void;
   setVerificationCode: (code: string) => void;
+  setResendCooldown: () => void;
 }
 
 export const useSignup = create<SignupState>()(
@@ -29,6 +31,7 @@ export const useSignup = create<SignupState>()(
           registrationToken: null as string | null,
           registrationEmail: null as string | null,
           verificationCode: null as string | null,
+          resendCooldownExpiry: null as number | null,
         },
         (set) => ({
           nextStep: () => {
@@ -45,6 +48,10 @@ export const useSignup = create<SignupState>()(
           reset: () => {
             set((state) => {
               state.step = "initial";
+              state.registrationToken = null;
+              state.registrationEmail = null;
+              state.verificationCode = null;
+              state.resendCooldownExpiry = null;
             });
           },
           setRegistrationToken: (token: string) => {
@@ -62,8 +69,14 @@ export const useSignup = create<SignupState>()(
               state.verificationCode = code;
             });
           },
+          setResendCooldown: () => {
+            set((state) => {
+              state.resendCooldownExpiry = Date.now() + 60000; // 1 minute from now
+            });
+          },
         }),
       ),
     ),
+    { name: "signup-store" },
   ),
 );

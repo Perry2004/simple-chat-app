@@ -1,4 +1,4 @@
-package net.perryz.simple_chat_app.services.auth;
+package net.perryz.simple_chat_app.services;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,15 +21,20 @@ import net.perryz.simple_chat_app.utilities.Utility;
 public class PreregistrationService {
     private final PreregistrationRepository preregistrationRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
     static final int PREREGISTRATION_EXPIRATION_MINUTES = 60;
 
     @Transactional
     public String preregisterUser(PreregisterUserRequest preregisterUserRequest) {
-        var email = preregisterUserRequest.email();
+        var email = Utility.normalizeString(preregisterUserRequest.email());
         var encodedPassword = passwordEncoder.encode(preregisterUserRequest.password());
         var registrationToken = generateRegistrationToken();
         var currentTime = LocalDateTime.now();
         var expiresAt = currentTime.plusMinutes(PREREGISTRATION_EXPIRATION_MINUTES);
+
+        if (userService.checkEmailAlreadyRegistered(email)) {
+            throw new IllegalArgumentException("Email is already registered: " + email);
+        }
 
         var existingPreregistration = preregistrationRepository.findByEmail(email);
 

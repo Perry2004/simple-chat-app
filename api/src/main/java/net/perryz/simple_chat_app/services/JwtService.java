@@ -1,4 +1,4 @@
-package net.perryz.simple_chat_app.services.auth;
+package net.perryz.simple_chat_app.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

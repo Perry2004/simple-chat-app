@@ -89,6 +89,7 @@ export const useTheme = create<ThemeState>()(
         },
       },
     ),
+    { name: "theme-store" },
   ),
 );
 

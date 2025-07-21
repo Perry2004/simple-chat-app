@@ -1,4 +1,4 @@
-package net.perryz.simple_chat_app.services.auth;
+package net.perryz.simple_chat_app.services;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

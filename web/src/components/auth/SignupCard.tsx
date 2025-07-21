@@ -6,10 +6,24 @@ import {
   Button,
   Divider,
   Form,
+  Spinner,
+  Alert,
 } from "@heroui/react";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  ShieldX,
+  ShieldEllipsis,
+} from "lucide-react";
+import { useState, useCallback, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import usePreregister from "@/hooks/api/usePreregister";
+import { useSignup } from "@/hooks/stores/useSignup";
+import { axiosInstance } from "@/utils/axiosInstance";
+import * as z from "zod";
 
 export interface SignupForm {
   email: string;
@@ -17,21 +31,57 @@ export interface SignupForm {
   confirmPassword: string;
 }
 
-export default function SignupForm({
-  onSubmit,
-}: {
-  onSubmit: SubmitHandler<SignupForm>;
-}) {
+export default function SignupCard() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const preregisterMutation = usePreregister();
+  const setRegistrationEmail = useSignup((state) => state.setRegistrationEmail);
+
+  const debouncedEmailCheck = useCallback(
+    async (email: string): Promise<string | boolean> => {
+      return new Promise((resolve) => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(async () => {
+          try {
+            const res = await axiosInstance.get(`/auth/check-email`, {
+              params: { email },
+            });
+            console.log("Email check result:", res.data);
+            if (res.data) {
+              resolve("Email already exists");
+            } else {
+              resolve(true);
+            }
+          } catch (error) {
+            console.error("Email validation error:", error);
+            resolve(true);
+          }
+        }, 1000);
+      });
+    },
+    [],
+  );
+
+  const onSubmit: SubmitHandler<SignupForm> = (data) => {
+    preregisterMutation.mutate({
+      email: data.email,
+      password: data.password,
+    });
+    setRegistrationEmail(data.email);
+  };
 
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isValid, isSubmitting, isValidating, dirtyFields },
   } = useForm<SignupForm>({
-    mode: "onTouched",
+    mode: "onBlur",
   });
   const watchPassword = watch("password");
 
@@ -51,8 +101,42 @@ export default function SignupForm({
             label="Email"
             placeholder="Enter your email"
             startContent={<Mail className="h-4 w-4 text-default-400" />}
-            isRequired
-            {...register("email")}
+            {...register("email", {
+              required: "Please enter your email",
+              validate: {
+                checkEmailAlreadyExists: debouncedEmailCheck,
+                checkEmailFormat: (value) => {
+                  const emailSchema = z.string().email();
+                  const result = emailSchema.safeParse(value);
+                  if (result.error) {
+                    return "Please enter a valid email address";
+                  }
+                  return true;
+                },
+              },
+            })}
+            isInvalid={!!errors.email}
+            errorMessage={errors.email?.message}
+            endContent={
+              <button className="focus:outline-none" type="button" disabled>
+                {(() => {
+                  if (isValidating) {
+                    return (
+                      <ShieldEllipsis className="h-4 w-4 text-yellow-500" />
+                    );
+                  }
+                  if (errors.email) {
+                    return <ShieldX className="h-4 w-4 text-red-500" />;
+                  }
+                  if (dirtyFields.email && !errors.email) {
+                    return <ShieldCheck className="h-4 w-4 text-green-500" />;
+                  }
+                  return (
+                    <ShieldEllipsis className="h-4 w-4 text-default-300" />
+                  );
+                })()}
+              </button>
+            }
           />
           <Input
             label="Password"
@@ -72,8 +156,8 @@ export default function SignupForm({
               </button>
             }
             type={isPasswordVisible ? "text" : "password"}
-            isRequired
             {...register("password", {
+              required: "Please enter a password",
               minLength: {
                 value: 6,
                 message: "Password must be at least 6 characters",
@@ -100,17 +184,37 @@ export default function SignupForm({
               </button>
             }
             type={isConfirmVisible ? "text" : "password"}
-            isRequired
             {...register("confirmPassword", {
+              required: "Please confirm your password",
               validate: (value) =>
                 value === watchPassword || "Passwords do not match",
             })}
             errorMessage={errors.confirmPassword?.message}
             isInvalid={!!errors.confirmPassword}
-          />{" "}
-          <div className="flex w-full justify-center">
-            <Button color="primary" size="lg" className="mt-2" type="submit">
-              Create Account
+          />
+          <div className="flex w-full flex-col items-center justify-center">
+            {preregisterMutation.isError && (
+              <Alert
+                color="danger"
+                variant="flat"
+                title="Registration Failed"
+                description={
+                  "An error occurred during registration. Please try again."
+                }
+              />
+            )}
+            <Button
+              color="primary"
+              size="lg"
+              className="mt-2"
+              type="submit"
+              isDisabled={!isValid}
+            >
+              {preregisterMutation.isPending || isSubmitting ? (
+                <Spinner color="default" />
+              ) : (
+                "Create Account"
+              )}
             </Button>
           </div>
         </Form>

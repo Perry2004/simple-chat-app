@@ -1,4 +1,4 @@
-package net.perryz.simple_chat_app.services.auth;
+package net.perryz.simple_chat_app.services;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +14,7 @@ import net.perryz.simple_chat_app.entities.User;
 import net.perryz.simple_chat_app.repositories.PreregistrationRepository;
 import net.perryz.simple_chat_app.repositories.UserRepository;
 import net.perryz.simple_chat_app.repositories.VerificationRepository;
+import net.perryz.simple_chat_app.utilities.Utility;
 
 @Service
 @RequiredArgsConstructor
@@ -23,17 +24,19 @@ public class RegistrationService {
     private final PreregistrationService preregistrationService;
     private final PreregistrationRepository preregistrationRepository;
     private final VerificationRepository verificationRepository;
+    private final UserService userService;
 
     @Transactional
     public RegisterUserResponse register(RegisterUserRequest registerRequest) {
-        var email = registerRequest.email();
+        var email = Utility.normalizeString(registerRequest.email());
         var registrationToken = registerRequest.registrationToken();
         var verificationCode = registerRequest.verificationCode();
 
         preregistrationService.verifyRegistrationToken(registrationToken, email);
-
+        if (userService.checkEmailAlreadyRegistered(email)) {
+            throw new IllegalArgumentException("Email is already registered: " + email);
+        }
         verifyVerificationCode(email, verificationCode);
-
         Preregistration preregistration = preregistrationRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Preregistration not found for email: " + email));
         var user = new User();

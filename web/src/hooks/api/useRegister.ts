@@ -20,5 +20,8 @@ export default function useRegister() {
       nextStep();
       console.log(data);
     },
+    onError: (error) => {
+      console.error("Registration failed:", error);
+    },
   });
 }
