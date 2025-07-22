@@ -39,6 +39,7 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 	implementation 'org.springframework.boot:spring-boot-starter-mail:3.5.3'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator:3.5.3'
 }
 
 tasks.named('test') {

@@ -5,6 +5,7 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +16,7 @@ import net.perryz.simple_chat_app.dtos.SendVerificationRequest;
 import net.perryz.simple_chat_app.entities.Verification;
 import net.perryz.simple_chat_app.repositories.PreregistrationRepository;
 import net.perryz.simple_chat_app.repositories.VerificationRepository;
-import net.perryz.simple_chat_app.utilities.Utility;
+import net.perryz.simple_chat_app.utilities.StringUtil;
 
 @Service
 @Slf4j
@@ -26,6 +27,7 @@ public class VerificationService {
     private final VerificationRepository verificationRepository;
     private final PreregistrationService preregistrationService;
     private static final int VERIFICATION_EXPIRATION_MINUTES = 10;
+    private final StringUtil stringUtil;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -33,7 +35,7 @@ public class VerificationService {
     @Transactional
     public void sendVerificationEmail(SendVerificationRequest sendVerificationRequest) {
         var registrationToken = sendVerificationRequest.registrationToken();
-        var email = Utility.normalizeString(sendVerificationRequest.email());
+        var email = stringUtil.normalizeString(sendVerificationRequest.email());
 
         validatePayload(sendVerificationRequest);
 
@@ -90,6 +92,7 @@ public class VerificationService {
         return code.toString();
     }
 
+    @Async
     private void sendVerificationEmail(String email, String code) {
         log.info("Sending verification email to: {}", email);
         SimpleMailMessage message = new SimpleMailMessage();

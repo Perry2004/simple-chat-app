@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.perryz.simple_chat_app.dtos.PreregisterUserRequest;
 import net.perryz.simple_chat_app.entities.Preregistration;
 import net.perryz.simple_chat_app.repositories.PreregistrationRepository;
-import net.perryz.simple_chat_app.utilities.Utility;
+import net.perryz.simple_chat_app.utilities.StringUtil;
 
 @Service
 @RequiredArgsConstructor
@@ -23,10 +23,11 @@ public class PreregistrationService {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     static final int PREREGISTRATION_EXPIRATION_MINUTES = 60;
+    private final StringUtil stringUtil;
 
     @Transactional
     public String preregisterUser(PreregisterUserRequest preregisterUserRequest) {
-        var email = Utility.normalizeString(preregisterUserRequest.email());
+        var email = stringUtil.normalizeString(preregisterUserRequest.email());
         var encodedPassword = passwordEncoder.encode(preregisterUserRequest.password());
         var registrationToken = generateRegistrationToken();
         var currentTime = LocalDateTime.now();
@@ -39,7 +40,7 @@ public class PreregistrationService {
         var existingPreregistration = preregistrationRepository.findByEmail(email);
 
         var preregistration = new Preregistration();
-        preregistration.setEmail(Utility.normalizeString(email));
+        preregistration.setEmail(stringUtil.normalizeString(email));
         preregistration.setPassword(encodedPassword);
         preregistration.setRegistrationToken(registrationToken);
         preregistration.setExpiresAt(expiresAt);

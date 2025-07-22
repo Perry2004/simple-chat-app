@@ -14,7 +14,7 @@ import net.perryz.simple_chat_app.entities.User;
 import net.perryz.simple_chat_app.repositories.PreregistrationRepository;
 import net.perryz.simple_chat_app.repositories.UserRepository;
 import net.perryz.simple_chat_app.repositories.VerificationRepository;
-import net.perryz.simple_chat_app.utilities.Utility;
+import net.perryz.simple_chat_app.utilities.StringUtil;
 
 @Service
 @RequiredArgsConstructor
@@ -25,10 +25,12 @@ public class RegistrationService {
     private final PreregistrationRepository preregistrationRepository;
     private final VerificationRepository verificationRepository;
     private final UserService userService;
+    private final StringUtil stringUtil;
+    private final VerificationService verificationService;
 
     @Transactional
     public RegisterUserResponse register(RegisterUserRequest registerRequest) {
-        var email = Utility.normalizeString(registerRequest.email());
+        var email = stringUtil.normalizeString(registerRequest.email());
         var registrationToken = registerRequest.registrationToken();
         var verificationCode = registerRequest.verificationCode();
 
@@ -36,7 +38,7 @@ public class RegistrationService {
         if (userService.checkEmailAlreadyRegistered(email)) {
             throw new IllegalArgumentException("Email is already registered: " + email);
         }
-        verifyVerificationCode(email, verificationCode);
+        verificationService.verifyCode(email, verificationCode);
         Preregistration preregistration = preregistrationRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Preregistration not found for email: " + email));
         var user = new User();
@@ -44,26 +46,12 @@ public class RegistrationService {
         user.setPassword(preregistration.getPassword());
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
-        user.setCustomizedUserName(email);
         userRepository.save(user);
 
         preregistrationRepository.delete(preregistration);
         verificationRepository.deleteByEmail(email);
 
-        return new RegisterUserResponse(user.getEmail(), user.getCustomizedUserName());
-    }
-
-    void verifyVerificationCode(String email, String verificationCode) {
-        var verification = verificationRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Verification not found for email: " + email));
-
-        if (!verification.getVerificationCode().equals(verificationCode)) {
-            throw new IllegalArgumentException("Invalid verification code");
-        }
-
-        if (verification.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Verification code has expired");
-        }
+        return new RegisterUserResponse(user.getEmail());
     }
 
 }

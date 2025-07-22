@@ -12,47 +12,47 @@ import org.springframework.transaction.annotation.Transactional;
 import net.perryz.simple_chat_app.entities.Preregistration;
 
 public interface PreregistrationRepository extends JpaRepository<Preregistration, Long> {
-    Optional<Preregistration> findByEmail(String email);
+        Optional<Preregistration> findByEmail(String email);
 
-    void deleteByEmail(String email);
+        void deleteByEmail(String email);
 
-    @Transactional
-    @Modifying
-    @Query("""
-            UPDATE Preregistration p
-            SET p.password = :#{#preregistration.password},
-            p.registrationToken = :#{#preregistration.registrationToken},
-            p.expiresAt = :#{#preregistration.expiresAt}
-            WHERE p.email = :#{#preregistration.email}
-            """)
-    void updateByEmail(@Param("preregistration") Preregistration preregistration);
+        @Transactional
+        @Modifying
+        @Query("""
+                        UPDATE Preregistration p
+                        SET p.password = :#{#preregistration.password},
+                        p.registrationToken = :#{#preregistration.registrationToken},
+                        p.expiresAt = :#{#preregistration.expiresAt}
+                        WHERE p.email = :#{#preregistration.email}
+                        """)
+        void updateByEmail(@Param("preregistration") Preregistration preregistration);
 
-    @Transactional
-    @Modifying
-    @Query("""
-            DELETE FROM Preregistration p
-            WHERE p.expiresAt < :currentTime
-            """)
-    int deleteExpiredPreregistrations(@Param("currentTime") LocalDateTime currentTime);
+        @Transactional
+        @Modifying
+        @Query("""
+                        DELETE FROM Preregistration p
+                        WHERE p.expiresAt < :currentTime
+                        """)
+        int deleteExpiredPreregistrations(@Param("currentTime") LocalDateTime currentTime);
 
-    Optional<Preregistration> findByRegistrationToken(String registrationToken);
+        Optional<Preregistration> findByRegistrationToken(String registrationToken);
 
-    @Transactional
-    @Modifying(flushAutomatically = true)
-    @Query("""
-            UPDATE Preregistration p
-            SET p.verification.id = :verificationId
-            WHERE p.email = :email
-            """)
-    void updateVerificationIdByEmail(@Param("email") String email, @Param("verificationId") Long verificationId);
+        @Transactional
+        @Modifying(flushAutomatically = true)
+        @Query("""
+                        UPDATE Preregistration p
+                        SET p.verification.id = :verificationId
+                        WHERE p.email = :email
+                        """)
+        void updateVerificationIdByEmail(@Param("email") String email, @Param("verificationId") Long verificationId);
 
-    @Transactional
-    @Modifying()
-    @Query("""
-            UPDATE Preregistration p
-            SET p.expiresAt = :expiresAt
-            WHERE p.email = :email
-            """)
-    void updateExpiresAtByEmail(@Param("email") String email, @Param("expiresAt") LocalDateTime expiresAt);
+        @Transactional
+        @Modifying()
+        @Query("""
+                        UPDATE Preregistration p
+                        SET p.expiresAt = :expiresAt
+                        WHERE p.email = :email
+                        """)
+        void updateExpiresAtByEmail(@Param("email") String email, @Param("expiresAt") LocalDateTime expiresAt);
 
 }
