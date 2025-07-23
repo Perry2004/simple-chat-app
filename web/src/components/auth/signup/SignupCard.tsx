@@ -49,9 +49,6 @@ export default function SignupCard() {
 
   useEffect(() => {
     const email = formData.email.trim();
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
 
     if (email === lastEmailRef.current) {
       return;
@@ -66,6 +63,9 @@ export default function SignupCard() {
       return;
     }
     setEmailValidating(true);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     timeoutRef.current = setTimeout(async () => {
       try {
         console.log("Validating email:", email);
@@ -74,7 +74,7 @@ export default function SignupCard() {
       } catch (error) {
         console.error("Email validation error:", error);
       }
-    }, 1000);
+    }, 500);
   }, [formData.email]);
 
   const {
@@ -101,7 +101,6 @@ export default function SignupCard() {
         <h1 className="text-2xl font-bold">Sign Up </h1>
         <p className="text-default-500 text-small">
           Create your account to get started
-          {"Email validating: " + emailValidating}
         </p>
       </CardHeader>
       <Divider />
@@ -166,6 +165,7 @@ export default function SignupCard() {
                 className="focus:outline-none"
                 type="button"
                 onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                tabIndex={-1}
               >
                 {isPasswordVisible ? (
                   <EyeOff className="h-4 w-4 text-default-400" />
@@ -193,6 +193,7 @@ export default function SignupCard() {
                 className="focus:outline-none"
                 type="button"
                 onClick={() => setIsConfirmVisible(!isConfirmVisible)}
+                tabIndex={-1}
               >
                 {isConfirmVisible ? (
                   <EyeOff className="h-4 w-4 text-default-400" />

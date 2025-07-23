@@ -11,13 +11,6 @@ import { useEffect } from "react";
 export type Theme = "light" | "dark" | "device";
 export type ResolvedTheme = "light" | "dark";
 
-interface ThemeState {
-  theme: Theme;
-  resolvedTheme: ResolvedTheme;
-  setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
-}
-
 const getSystemTheme = (): ResolvedTheme => {
   if (typeof window === "undefined") {
     return "light";
@@ -31,7 +24,7 @@ const resolveTheme = (theme: Theme): ResolvedTheme => {
   return theme === "device" ? getSystemTheme() : theme;
 };
 
-export const useTheme = create<ThemeState>()(
+export const useTheme = create(
   devtools(
     persist(
       immer(

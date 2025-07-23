@@ -31,6 +31,15 @@ export const useSignup = create(
               }
             });
           },
+          prevStep: () => {
+            set((state) => {
+              if (state.step === "verification-sent") {
+                state.step = "entered-credentials";
+              } else if (state.step === "entered-credentials") {
+                state.step = "initial";
+              }
+            });
+          },
           reset: () => {
             set((state) => {
               state.step = "initial";

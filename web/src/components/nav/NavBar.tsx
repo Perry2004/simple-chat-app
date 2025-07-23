@@ -12,21 +12,33 @@ import {
 import { MessageCircleCode } from "lucide-react";
 import { useState } from "react";
 import ThemeSelection from "./ThemeSelection";
+import { useLoginState } from "@/hooks/stores/useLoginState";
+import LogoutButton from "../auth/logout/LogoutButton";
 
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuItems = [
-    "Profile",
+
+  const loggedEmail = useLoginState((state) => state.loggedEmail);
+  const isLoggedIn = !!loggedEmail;
+
+  const loggedInMenuItems = [
+    "Chat",
     "Dashboard",
-    "Activity",
-    "Analytics",
-    "System",
-    "Deployments",
+    "Profile",
     "My Settings",
-    "Team Settings",
     "Help & Feedback",
     "Log Out",
   ];
+
+  const loggedOutMenuItems = [
+    "Features",
+    "About",
+    "Contact",
+    "Log In",
+    "Sign Up",
+  ];
+
+  const menuItems = isLoggedIn ? loggedInMenuItems : loggedOutMenuItems;
 
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen}>
@@ -44,50 +56,112 @@ export default function NavBar() {
       </NavbarContent>
 
       <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Features
-          </Link>
-        </NavbarItem>
-        <NavbarItem isActive>
-          <Link aria-current="page" href="#">
-            Customers
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Integrations
-          </Link>
-        </NavbarItem>
+        {isLoggedIn ? (
+          <>
+            <NavbarItem>
+              <Link color="foreground" href="/app/current">
+                Chat
+              </Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Link color="foreground" href="#">
+                Dashboard
+              </Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Link color="foreground" href="#">
+                Profile
+              </Link>
+            </NavbarItem>
+          </>
+        ) : (
+          <>
+            <NavbarItem>
+              <Link color="foreground" href="#">
+                Features
+              </Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Link color="foreground" href="#">
+                About
+              </Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Link color="foreground" href="#">
+                Contact
+              </Link>
+            </NavbarItem>
+          </>
+        )}
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
           <ThemeSelection />
         </NavbarItem>
-        <NavbarItem>
-          <Button as={Link} color="primary" href="/auth/login" variant="flat">
-            Log In
-          </Button>
-        </NavbarItem>
-        <NavbarItem>
-          <Button as={Link} color="primary" href="/auth/signup" variant="flat">
-            Sign Up
-          </Button>
-        </NavbarItem>
+        {isLoggedIn ? (
+          <>
+            <NavbarItem className="hidden sm:flex">
+              <span className="text-sm text-default-500">
+                Welcome, {loggedEmail}
+              </span>
+            </NavbarItem>
+            <NavbarItem>
+              <LogoutButton />
+            </NavbarItem>
+          </>
+        ) : (
+          <>
+            <NavbarItem className="hidden lg:flex">
+              <Button
+                as={Link}
+                color="primary"
+                href="/auth/login"
+                variant="light"
+              >
+                Log In
+              </Button>
+            </NavbarItem>
+            <NavbarItem>
+              <Button
+                as={Link}
+                color="primary"
+                href="/auth/signup"
+                variant="flat"
+              >
+                Sign Up
+              </Button>
+            </NavbarItem>
+          </>
+        )}
       </NavbarContent>
       <NavbarMenu>
+        {isLoggedIn && (
+          <NavbarMenuItem key="user-email">
+            <div className="w-full border-b border-default-200 p-2 text-sm text-default-500">
+              Welcome, {loggedEmail}
+            </div>
+          </NavbarMenuItem>
+        )}
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item}-${index}`}>
             <Link
               className="w-full"
               color={
-                index === 2
-                  ? "primary"
-                  : index === menuItems.length - 1
-                    ? "danger"
+                item === "Log Out"
+                  ? "danger"
+                  : item === "Chat" || item === "Sign Up"
+                    ? "primary"
                     : "foreground"
               }
-              href="#"
+              href={
+                item === "Chat"
+                  ? "/app/current"
+                  : item === "Log In"
+                    ? "/auth/login"
+                    : item === "Sign Up"
+                      ? "/auth/signup"
+                      : "#"
+              }
               size="lg"
             >
               {item}

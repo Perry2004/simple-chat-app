@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MessageCircleCode } from "lucide-react";
 
-export const Route = createFileRoute("/(app)/")({
+export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
 
