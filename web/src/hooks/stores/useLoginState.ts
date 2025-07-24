@@ -8,6 +8,7 @@ export const useLoginState = create(
         combine(
           {
             loggedEmail: null as string | null,
+            beforeLoginPath: null as string | null,
           },
           (set) => ({
             login: (email: string) => {
@@ -18,6 +19,11 @@ export const useLoginState = create(
             logout: () => {
               set((state) => {
                 state.loggedEmail = null;
+              });
+            },
+            setBeforeLoginPath: (path: string) => {
+              set((state) => {
+                state.beforeLoginPath = path;
               });
             },
           }),

@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as Exceptions404RouteImport } from './routes/exceptions/404'
+import { Route as Exceptions401RouteImport } from './routes/exceptions/401'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthenticatedCurrentRouteImport } from './routes/_authenticated/current'
@@ -22,6 +24,16 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Exceptions404Route = Exceptions404RouteImport.update({
+  id: '/exceptions/404',
+  path: '/exceptions/404',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Exceptions401Route = Exceptions401RouteImport.update({
+  id: '/exceptions/401',
+  path: '/exceptions/401',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -45,12 +57,16 @@ export interface FileRoutesByFullPath {
   '/current': typeof AuthenticatedCurrentRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/exceptions/401': typeof Exceptions401Route
+  '/exceptions/404': typeof Exceptions404Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/current': typeof AuthenticatedCurrentRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/exceptions/401': typeof Exceptions401Route
+  '/exceptions/404': typeof Exceptions404Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,12 +75,26 @@ export interface FileRoutesById {
   '/_authenticated/current': typeof AuthenticatedCurrentRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/exceptions/401': typeof Exceptions401Route
+  '/exceptions/404': typeof Exceptions404Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/current' | '/auth/login' | '/auth/signup'
+  fullPaths:
+    | '/'
+    | '/current'
+    | '/auth/login'
+    | '/auth/signup'
+    | '/exceptions/401'
+    | '/exceptions/404'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/current' | '/auth/login' | '/auth/signup'
+  to:
+    | '/'
+    | '/current'
+    | '/auth/login'
+    | '/auth/signup'
+    | '/exceptions/401'
+    | '/exceptions/404'
   id:
     | '__root__'
     | '/'
@@ -72,6 +102,8 @@ export interface FileRouteTypes {
     | '/_authenticated/current'
     | '/auth/login'
     | '/auth/signup'
+    | '/exceptions/401'
+    | '/exceptions/404'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -79,6 +111,8 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  Exceptions401Route: typeof Exceptions401Route
+  Exceptions404Route: typeof Exceptions404Route
 }
 
 declare module '@tanstack/react-router' {
@@ -95,6 +129,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exceptions/404': {
+      id: '/exceptions/404'
+      path: '/exceptions/404'
+      fullPath: '/exceptions/404'
+      preLoaderRoute: typeof Exceptions404RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exceptions/401': {
+      id: '/exceptions/401'
+      path: '/exceptions/401'
+      fullPath: '/exceptions/401'
+      preLoaderRoute: typeof Exceptions401RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signup': {
@@ -138,6 +186,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
+  Exceptions401Route: Exceptions401Route,
+  Exceptions404Route: Exceptions404Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

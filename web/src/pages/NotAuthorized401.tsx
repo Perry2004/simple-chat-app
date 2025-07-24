@@ -1,8 +1,18 @@
 import { Card, CardHeader, CardBody, Button } from "@heroui/react";
-import { Link } from "@tanstack/react-router";
-import { ShieldX, LogIn } from "lucide-react";
+import { Link, useRouter } from "@tanstack/react-router";
+import { ShieldX, LogIn, ArrowLeft } from "lucide-react";
 
 export default function NotAuthorized401() {
+  const router = useRouter();
+
+  const handleGoBack = () => {
+    if (window.history.length > 1) {
+      router.history.back();
+    } else {
+      router.navigate({ to: "/" });
+    }
+  };
+
   return (
     <div className="flex h-full w-full items-center justify-center">
       <Card className="w-full max-w-md">
@@ -17,16 +27,26 @@ export default function NotAuthorized401() {
           <p className="text-center text-sm text-foreground-600">
             Please log in with your account to continue accessing this content.
           </p>
-          <Link to="/auth/login" className="w-full">
+          <div className="flex w-full flex-col gap-3 sm:flex-row">
+            <Link to="/auth/login" className="w-full">
+              <Button
+                color="primary"
+                variant="solid"
+                className="w-full"
+                startContent={<LogIn className="h-4 w-4" />}
+              >
+                Go to Login
+              </Button>
+            </Link>
             <Button
-              color="primary"
-              variant="solid"
+              variant="faded"
               className="w-full"
-              startContent={<LogIn className="h-4 w-4" />}
+              onPress={handleGoBack}
+              startContent={<ArrowLeft className="h-4 w-4" />}
             >
-              Go to Login
+              Go Back
             </Button>
-          </Link>
+          </div>
         </CardBody>
       </Card>
     </div>
