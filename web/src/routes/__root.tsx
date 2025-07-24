@@ -39,9 +39,9 @@ export const Route = createRootRoute({
   notFoundComponent: () => <NotFound404 />,
 });
 
-const queryClient = new QueryClient();
 function RootComponent() {
   const router = useRouter();
+  const queryClient = new QueryClient();
 
   return (
     <RootDocument>

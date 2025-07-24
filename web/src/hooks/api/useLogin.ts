@@ -14,13 +14,10 @@ export default function useLogin() {
       return response.data;
     },
     onSuccess: (data) => {
-      const message = data.message;
       const email = data.email;
-      const tokenExpiresIn = data.expiresIn;
-      const tokenExpiresAt = new Date().getTime() / 1000 + tokenExpiresIn;
-
-      login(email, tokenExpiresAt);
-      console.log("Login successful:", message, tokenExpiresAt, email);
+      const message = data.message;
+      login(email);
+      console.log("Login successful:", message);
     },
   });
 }

@@ -8,19 +8,16 @@ export const useLoginState = create(
         combine(
           {
             loggedEmail: null as string | null,
-            tokenExpiresAt: null as number | null,
           },
           (set) => ({
-            login: (email: string, tokenExpiresAt: number) => {
+            login: (email: string) => {
               set((state) => {
                 state.loggedEmail = email;
-                state.tokenExpiresAt = tokenExpiresAt;
               });
             },
             logout: () => {
               set((state) => {
                 state.loggedEmail = null;
-                state.tokenExpiresAt = null;
               });
             },
           }),
