@@ -3,6 +3,7 @@ import path from "path";
 import react from "@vitejs/plugin-react";
 import tsConfigPaths from "vite-tsconfig-paths";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import removeConsole from "vite-plugin-remove-console";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,6 +13,7 @@ export default defineConfig({
       customViteReactPlugin: true,
     }),
     react(),
+    removeConsole(),
   ],
   resolve: {
     alias: {
