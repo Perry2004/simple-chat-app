@@ -1,9 +1,11 @@
+import { useLoginState } from "@/hooks/stores/useLoginState";
 import { Card, CardHeader, CardBody, Button } from "@heroui/react";
-import { Link, useRouter } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { ShieldX, LogIn, ArrowLeft } from "lucide-react";
 
 export default function NotAuthorized401() {
   const router = useRouter();
+  const setBeforeLoginPath = useLoginState((state) => state.setBeforeLoginPath);
 
   const handleGoBack = () => {
     if (window.history.length > 1) {
@@ -11,6 +13,11 @@ export default function NotAuthorized401() {
     } else {
       router.navigate({ to: "/" });
     }
+  };
+
+  const handleGoToLogin = () => {
+    setBeforeLoginPath(location.pathname);
+    router.navigate({ to: "/auth/login" });
   };
 
   return (
@@ -28,16 +35,15 @@ export default function NotAuthorized401() {
             Please log in with your account to continue accessing this content.
           </p>
           <div className="flex w-full flex-col gap-3 sm:flex-row">
-            <Link to="/auth/login" className="w-full">
-              <Button
-                color="primary"
-                variant="solid"
-                className="w-full"
-                startContent={<LogIn className="h-4 w-4" />}
-              >
-                Go to Login
-              </Button>
-            </Link>
+            <Button
+              color="primary"
+              variant="solid"
+              className="w-full"
+              onPress={handleGoToLogin}
+              startContent={<LogIn className="h-4 w-4" />}
+            >
+              Go to Login
+            </Button>
             <Button
               variant="faded"
               className="w-full"

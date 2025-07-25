@@ -14,8 +14,11 @@ import { useState } from "react";
 import ThemeSelection from "./ThemeSelection";
 import { useLoginState } from "@/hooks/stores/useLoginState";
 import LogoutButton from "../auth/logout/LogoutButton";
+import useAuthenticate from "@/hooks/api/useAuthenticate";
 
 export default function NavBar() {
+  // initiate authentication check to set the account state
+  useAuthenticate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const loggedEmail = useLoginState((state) => state.loggedEmail);

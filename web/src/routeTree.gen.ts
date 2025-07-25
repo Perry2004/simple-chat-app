@@ -9,14 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoadingRouteImport } from './routes/loading'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as Exceptions404RouteImport } from './routes/exceptions/404'
-import { Route as Exceptions401RouteImport } from './routes/exceptions/401'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthenticatedCurrentRouteImport } from './routes/_authenticated/current'
 
+const LoadingRoute = LoadingRouteImport.update({
+  id: '/loading',
+  path: '/loading',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -24,16 +28,6 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Exceptions404Route = Exceptions404RouteImport.update({
-  id: '/exceptions/404',
-  path: '/exceptions/404',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Exceptions401Route = Exceptions401RouteImport.update({
-  id: '/exceptions/401',
-  path: '/exceptions/401',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -54,69 +48,59 @@ const AuthenticatedCurrentRoute = AuthenticatedCurrentRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/loading': typeof LoadingRoute
   '/current': typeof AuthenticatedCurrentRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
-  '/exceptions/401': typeof Exceptions401Route
-  '/exceptions/404': typeof Exceptions404Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/loading': typeof LoadingRoute
   '/current': typeof AuthenticatedCurrentRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
-  '/exceptions/401': typeof Exceptions401Route
-  '/exceptions/404': typeof Exceptions404Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/loading': typeof LoadingRoute
   '/_authenticated/current': typeof AuthenticatedCurrentRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
-  '/exceptions/401': typeof Exceptions401Route
-  '/exceptions/404': typeof Exceptions404Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/current'
-    | '/auth/login'
-    | '/auth/signup'
-    | '/exceptions/401'
-    | '/exceptions/404'
+  fullPaths: '/' | '/loading' | '/current' | '/auth/login' | '/auth/signup'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/current'
-    | '/auth/login'
-    | '/auth/signup'
-    | '/exceptions/401'
-    | '/exceptions/404'
+  to: '/' | '/loading' | '/current' | '/auth/login' | '/auth/signup'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/loading'
     | '/_authenticated/current'
     | '/auth/login'
     | '/auth/signup'
-    | '/exceptions/401'
-    | '/exceptions/404'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoadingRoute: typeof LoadingRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
-  Exceptions401Route: typeof Exceptions401Route
-  Exceptions404Route: typeof Exceptions404Route
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/loading': {
+      id: '/loading'
+      path: '/loading'
+      fullPath: '/loading'
+      preLoaderRoute: typeof LoadingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -129,20 +113,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/exceptions/404': {
-      id: '/exceptions/404'
-      path: '/exceptions/404'
-      fullPath: '/exceptions/404'
-      preLoaderRoute: typeof Exceptions404RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/exceptions/401': {
-      id: '/exceptions/401'
-      path: '/exceptions/401'
-      fullPath: '/exceptions/401'
-      preLoaderRoute: typeof Exceptions401RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signup': {
@@ -184,10 +154,9 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoadingRoute: LoadingRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
-  Exceptions401Route: Exceptions401Route,
-  Exceptions404Route: Exceptions404Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

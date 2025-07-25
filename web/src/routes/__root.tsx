@@ -6,13 +6,15 @@ import {
   Scripts,
   useRouter,
 } from "@tanstack/react-router";
-import NotFound404 from "@/pages/NotFound404";
+import NotFound404 from "@/components/status/NotFound404";
 import "@/styles/index.css";
 import { HeroUIProvider } from "@heroui/react";
 import RootLayout from "@/layouts/RootLayout";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+const queryClient = new QueryClient();
 
 export const Route = createRootRoute({
   head: () => ({
@@ -37,11 +39,13 @@ export const Route = createRootRoute({
   }),
   component: RootComponent,
   notFoundComponent: () => <NotFound404 />,
+  context: () => ({
+    queryClient,
+  }),
 });
 
 function RootComponent() {
   const router = useRouter();
-  const queryClient = new QueryClient();
 
   return (
     <RootDocument>

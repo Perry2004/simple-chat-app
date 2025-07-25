@@ -1,5 +1,4 @@
 import NavBar from "@/components/nav/NavBar";
-import useAuthenticate from "@/hooks/api/useAuthenticate";
 import { useTheme, useThemeInitialization } from "@/hooks/stores/useTheme";
 import { Outlet } from "@tanstack/react-router";
 
@@ -7,9 +6,6 @@ export default function RootLayout() {
   const resolvedTheme = useTheme((state) => state.resolvedTheme);
   // Initialize theme properly on client side to avoid hydration mismatch
   useThemeInitialization();
-
-  // initial authentication check, this will be used to render the navbar
-  useAuthenticate();
 
   return (
     <div

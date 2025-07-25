@@ -1,29 +1,31 @@
-import useAuthenticate from "@/hooks/api/useAuthenticate";
+import { authenticateQueryOptions } from "@/hooks/api/useAuthenticate";
 import { useLoginState } from "@/hooks/stores/useLoginState";
-import NotAuthorized401 from "@/pages/NotAuthorized401";
-import { Spinner } from "@heroui/react";
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import NotAuthorized401 from "@/components/status/NotAuthorized401";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+import Loading from "@/components/status/Loading";
 
 export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
-  beforeLoad: async () => {
+  beforeLoad: async ({ context }) => {
+    const queryClient = context.queryClient;
     const loggedEmail = useLoginState.getState().loggedEmail;
     if (!loggedEmail) {
-      useLoginState.getState().setBeforeLoginPath(location.pathname);
-      throw redirect({
-        to: "/exceptions/401",
-      });
+      console.log("Not logged in, ignoreing authentication check.");
+      return;
+    } else {
+      await queryClient.ensureQueryData(authenticateQueryOptions);
     }
   },
+  pendingComponent: () => (
+    <div className="flex h-full w-full items-center justify-center">
+      <Loading message="Authenticating..." size="lg" />
+    </div>
+  ),
 });
 
 function RouteComponent() {
-  // trigger an update on the query state on every access to the _authenticated route
-  const { isLoading, isError } = useAuthenticate();
   const loggedEmail = useLoginState((state) => state.loggedEmail);
-  if (isLoading || (!loggedEmail && !isError)) {
-    return <Spinner />;
-  } else if (!loggedEmail) {
+  if (!loggedEmail) {
     return <NotAuthorized401 />;
   } else {
     return <Outlet />;

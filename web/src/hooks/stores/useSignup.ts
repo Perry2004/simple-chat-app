@@ -66,7 +66,7 @@ export const useSignup = create(
           },
           setResendCooldown: () => {
             set((state) => {
-              state.resendCooldownExpiry = Date.now() + 60000; // 1 minute from now
+              state.resendCooldownExpiry = Date.now() + 1 * 60 * 1000; // 1 minute from now
             });
           },
         }),

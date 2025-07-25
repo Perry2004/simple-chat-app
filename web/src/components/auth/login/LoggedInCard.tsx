@@ -32,7 +32,7 @@ export default function LoggedInCard() {
         <div className="flex flex-col items-center gap-6">
           <div className="h-px w-full bg-gradient-to-r from-transparent via-default-200 to-transparent" />
           <Button
-            onClick={handleGoBack}
+            onPress={handleGoBack}
             color="primary"
             size="md"
             startContent={<ArrowLeft className="h-4 w-4" />}
