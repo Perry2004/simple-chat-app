@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({ BadCredentialsException.class, UsernameNotFoundException.class })
-    public ProblemDetail handleBadCredentials(BadCredentialsException ex) {
+    public ProblemDetail handleBadCredentials(Exception ex) {
         ProblemDetail errorDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.UNAUTHORIZED, ex.getMessage());
         errorDetail.setProperty("description", "Invalid username or password");
