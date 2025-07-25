@@ -115,26 +115,25 @@ public class VerificationService {
         // mailSender.send(message);
     }
 
-    public boolean verifyCode(String email, String verificationCode) {
+    public void verifyCode(String email, String verificationCode) {
         var verification = verificationRepository.findByEmail(email);
         if (verification.isEmpty()) {
             log.error("No verification found for email: {}", email);
-            return false;
+            throw new IllegalArgumentException("No verification found for email: " + email);
         }
 
         var verificationRecord = verification.get();
         if (isCodeExpired(verificationRecord)) {
             log.error("Verification code expired for email: {}", email);
-            return false;
+            throw new IllegalStateException("Verification code has expired for email: " + email);
         }
 
         if (!verificationRecord.getVerificationCode().equals(verificationCode)) {
             log.error("Invalid verification code for email: {}", email);
-            return false;
+            throw new IllegalArgumentException("Invalid verification code for email: " + email);
         }
 
         log.info("Verification code validated successfully for email: {}", email);
-        return true;
     }
 
     private boolean isCodeExpired(Verification verification) {
